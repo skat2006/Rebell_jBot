@@ -16,11 +16,12 @@ public class Bot extends TelegramLongPollingBot {
     final private String BOT_NAME = "Rebell_jBot";
     private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
     Storage storage;
+    CrossZero cz;
 
-    Bot()
-    {
+    Bot() {
         storage = new Storage();
         initKeyboard();
+        cz = new CrossZero();
     }
 
     @Override
@@ -59,26 +60,28 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-
-
-
     }
+
     public String parseMessage(String textMsg) {
-        String response;
+        String response = "";
 
         //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
-        if(textMsg.equals("/start"))
+        if (textMsg.equals("/start"))
             response = "Приветствую, бот знает много цитат. Жми /get, чтобы получить случайную из них";
-        else if(textMsg.equals("/get") || textMsg.equals("Просвяти"))
+        else if (textMsg.equals("/get") || textMsg.equals("Просвяти"))
             response = storage.getRandQuote();
-        else
+        else if (textMsg.equals("/game")) {
+            //response = "Начнем игру! И та-а-ак... Крестики-Нолики!!!/n";
+            response = cz.drawingOutput();
+        }
+        else {
             response = "Сообщение не распознано";
+        }
 
         return response;
     }
 
-    void initKeyboard()
-    {
+    void initKeyboard() {
         //Создаем объект будущей клавиатуры и выставляем нужные настройки
         replyKeyboardMarkup.setResizeKeyboard(true); //подгоняем размер
         replyKeyboardMarkup.setOneTimeKeyboard(false); //скрываем после использования
@@ -90,6 +93,15 @@ public class Bot extends TelegramLongPollingBot {
         keyboardRows.add(keyboardRow);
         //Добавляем одну кнопку с текстом "Просвяти" наш ряд
         keyboardRow.add(new KeyboardButton("Просвяти"));
+        /* keyboardRow.add(new KeyboardButton("1"));
+        keyboardRow.add(new KeyboardButton("2"));
+        keyboardRow.add(new KeyboardButton("3"));
+        keyboardRow.add(new KeyboardButton("4"));
+        keyboardRow.add(new KeyboardButton("5"));
+        keyboardRow.add(new KeyboardButton("6"));
+        keyboardRow.add(new KeyboardButton("7"));
+        keyboardRow.add(new KeyboardButton("8"));
+        keyboardRow.add(new KeyboardButton("9")); */
         //добавляем лист с одним рядом кнопок в главный объект
         replyKeyboardMarkup.setKeyboard(keyboardRows);
     }
