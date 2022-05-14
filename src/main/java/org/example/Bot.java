@@ -9,19 +9,47 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
-    final private String BOT_TOKEN = "5220931596:AAGX03h33AxME_xerUdxYwX4CqhMlT5Ab9k";
-    final private String BOT_NAME = "Rebell_jBot";
+    private String BOT_TOKEN = null;
+    private String BOT_NAME = null;
     private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
     Storage storage;
     CrossZero cz;
 
-    Bot() {
+    Bot() throws URISyntaxException {
         storage = new Storage();
+
+        readFile();
         initKeyboard();
-        cz = new CrossZero();
+    }
+
+    public void readFile() throws URISyntaxException {
+        List<String> lines;
+        File file;
+
+        URL resource = getClass().getClassLoader().getResource("settings.cfg");
+        if (resource == null) {
+            throw new IllegalArgumentException("file not found!");
+        } else {
+            file = new File(resource.toURI());
+        }
+
+        try {
+            lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+            BOT_TOKEN = lines.get(0);
+            BOT_NAME = lines.get(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -64,18 +92,90 @@ public class Bot extends TelegramLongPollingBot {
 
     public String parseMessage(String textMsg) {
         String response = "";
+        boolean gameOngoing = true;
 
         //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
-        if (textMsg.equals("/start"))
-            response = "Приветствую, бот знает много цитат. Жми /get, чтобы получить случайную из них";
-        else if (textMsg.equals("/get") || textMsg.equals("Просвяти"))
-            response = storage.getRandQuote();
-        else if (textMsg.equals("/game")) {
-            //response = "Начнем игру! И та-а-ак... Крестики-Нолики!!!/n";
-            response = cz.drawingOutput();
-        }
-        else {
-            response = "Сообщение не распознано";
+        switch (textMsg) {
+            case "/start" -> response = "Приветствую, бот знает много цитат. Жми /get, чтобы получить случайную из них";
+            case "/get", "Просвяти" -> response = storage.getRandQuote();
+            case "Новая игра" -> {
+                cz = new CrossZero();
+                response = "Начнем игру! И та-а-ак... Крестики-Нолики!!!\n\n" + cz.drawingOutput()
+                         + "\nВаш ход - первый! Левое поле - игровое, а на правом поле вы можете видеть соответствие цифр клетке, сделайте свой ход...";
+            }
+            case "1" -> {
+                gameOngoing = cz.gameOngoing(1);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "2" -> {
+                gameOngoing = cz.gameOngoing(2);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "3" -> {
+                gameOngoing = cz.gameOngoing(3);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "4" -> {
+                gameOngoing = cz.gameOngoing(4);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "5" -> {
+                gameOngoing = cz.gameOngoing(5);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "6" -> {
+                gameOngoing = cz.gameOngoing(6);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "7" -> {
+                gameOngoing = cz.gameOngoing(7);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "8" -> {
+                gameOngoing = cz.gameOngoing(8);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            case "9" -> {
+                gameOngoing = cz.gameOngoing(9);
+                if (gameOngoing) {
+                    response = cz.drawingOutput() + "\nВаш ход...";
+                } else {
+                    response = cz.drawingOutput();
+                }
+            }
+            default -> response = "Сообщение не распознано";
         }
 
         return response;
@@ -88,21 +188,28 @@ public class Bot extends TelegramLongPollingBot {
 
         //Создаем список с рядами кнопок
         ArrayList<KeyboardRow> keyboardRows = new ArrayList<>();
-        //Создаем один ряд кнопок и добавляем его в список
-        KeyboardRow keyboardRow = new KeyboardRow();
-        keyboardRows.add(keyboardRow);
-        //Добавляем одну кнопку с текстом "Просвяти" наш ряд
-        keyboardRow.add(new KeyboardButton("Просвяти"));
-        /* keyboardRow.add(new KeyboardButton("1"));
-        keyboardRow.add(new KeyboardButton("2"));
-        keyboardRow.add(new KeyboardButton("3"));
-        keyboardRow.add(new KeyboardButton("4"));
-        keyboardRow.add(new KeyboardButton("5"));
-        keyboardRow.add(new KeyboardButton("6"));
-        keyboardRow.add(new KeyboardButton("7"));
-        keyboardRow.add(new KeyboardButton("8"));
-        keyboardRow.add(new KeyboardButton("9")); */
-        //добавляем лист с одним рядом кнопок в главный объект
+        //Создаем ряды кнопок и добавляем их в список
+        KeyboardRow keyboardRow1 = new KeyboardRow();
+        KeyboardRow keyboardRow2 = new KeyboardRow();
+        KeyboardRow keyboardRow3 = new KeyboardRow();
+        KeyboardRow keyboardRow4 = new KeyboardRow();
+        keyboardRows.add(keyboardRow1);
+        keyboardRows.add(keyboardRow2);
+        keyboardRows.add(keyboardRow3);
+        keyboardRows.add(keyboardRow4);
+        //Добавляем кнопки
+        keyboardRow1.add(new KeyboardButton("Просвяти"));
+        keyboardRow1.add(new KeyboardButton("Новая игра"));
+        keyboardRow4.add(new KeyboardButton("1"));
+        keyboardRow4.add(new KeyboardButton("2"));
+        keyboardRow4.add(new KeyboardButton("3"));
+        keyboardRow3.add(new KeyboardButton("4"));
+        keyboardRow3.add(new KeyboardButton("5"));
+        keyboardRow3.add(new KeyboardButton("6"));
+        keyboardRow2.add(new KeyboardButton("7"));
+        keyboardRow2.add(new KeyboardButton("8"));
+        keyboardRow2.add(new KeyboardButton("9"));
+        //добавляем лист кнопок в главный объект
         replyKeyboardMarkup.setKeyboard(keyboardRows);
     }
 }
