@@ -21,7 +21,7 @@ import java.util.List;
 public class Bot extends TelegramLongPollingBot {
     private String BOT_TOKEN = null;
     private String BOT_NAME = null;
-    private final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+    private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
     private boolean gameOngoing = false;
     private Storage storage;
     private CrossZero cz;
