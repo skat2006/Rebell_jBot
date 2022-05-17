@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Storage {
-    private ArrayList<String> quoteList;
-    Storage()
-    {
+    private final ArrayList<String> quoteList;
+    Storage() throws InterruptedException {
         quoteList = new ArrayList<>();
-
+        quoteList.add("Тише будешь - дальше едешь!");
+        //wait(5000);
         parser("https://citatnica.ru/citaty/mudrye-tsitaty-velikih-lyudej");
     }
 
@@ -24,8 +24,7 @@ public class Storage {
         return quoteList.get(randValue);
     }
 
-    void parser(String strURL)
-    {
+    void parser(String strURL) {
         String className = "su-note-inner su-u-clearfix su-u-trim";
         Document doc = null;
         try {
@@ -36,11 +35,10 @@ public class Storage {
         }
 
         //Получаем группу объектов, обращаясь методом из Jsoup к определенному блоку
+        assert doc != null;
         Elements elQuote = doc.getElementsByClass(className);
 
         //Достаем текст из каждого объекта поочереди и добавляем в наше хранилище
-        elQuote.forEach(el -> {
-            quoteList.add(el.text());
-        });
+        elQuote.forEach(el -> quoteList.add(el.text()));
     }
 }

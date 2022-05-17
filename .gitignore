@@ -1,10 +1,8 @@
-/shelf/
-/workspace.xml
-/httpRequests/
-/dataSources/
-/dataSources.local.xml
-*.cfg
 *.iml
 /.idea/
-/target/
 /out/
+/src/main/resources/config.properties
+/src/main/java/META-INF/
+/target/
+/target/classes/
+/target/classes/org/example/
