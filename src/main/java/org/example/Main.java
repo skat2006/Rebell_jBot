@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 
 public class Main {
     public static void main(String[] args) {
-
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(new Bot());
