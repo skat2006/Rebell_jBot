@@ -2,14 +2,23 @@ package org.example;
 
 public class CrossZero {
 
-    private String[] cell;
+    private final String[] cell;
     private int[] cellDigital;
     private String gameRes;
+    private boolean gameOngoing;
 
     CrossZero() {
         cell = new String[]{"0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
         cellDigital = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         gameRes = " ";
+    }
+
+    public void setGameOngoing(boolean gameOngoing) {
+        this.gameOngoing = gameOngoing;
+    }
+
+    public boolean isGameOngoing() {
+        return gameOngoing;
     }
 
     // Метод обработчик вывода на консоль, ячеек со строкового массива cell
@@ -32,16 +41,17 @@ public class CrossZero {
         return outPut;
     }
 
-    public boolean gameOngoing(int index) {
+    public void gameOngoing(int index) {
         int more = 100; // Значение выхода из метода без результатно (метод не с работал)
 
         // ИГРОК ДЕЛАЕТ ХОД
         if (cellDigital[index] == 0) {
             cellDigital[index] = 1;
-            gameRes = " ";
+            gameRes = "Ваш ход...\n";
         } else {
             gameRes = "Клетка занята, сделайте другой ход...";
-            return true;
+            gameOngoing = true;
+            return;
         }
 
         // КОМПЬЮТЕР ДЕЛАЕТ ХОД
@@ -63,31 +73,29 @@ public class CrossZero {
 
         // ПРОВЕРЯЕМ РЕЗУЛЬТАТ ИГРЫ
         switch (checkResult()) {
-            case 21: {
-                gameRes = "НИКТО НЕ ПОБЕДИЛ - У НАС НИЧЬЯ !";
-                return false; // игра окончена
+            case 21 -> {
+                gameRes = "А вот и НИЧЬЯ! :)";
+                gameOngoing = false; // игра окончена
+                return;
             }
-            case 22: {
-                gameRes = "ПОЗДРАВЛЯЮ ВАС ВЫ ПОБЕДИТЕЛЬ !!!";
-                return false;
+            case 22 -> {
+                gameRes = "ВЫ ПОБЕДИТЕЛЬ !!!\nПриклоняюсь перед Вашим мастерством!";
+                gameOngoing = false; // игра окончена
+                return;
             }
-            case 23: {
-                gameRes = "К СОЖАЛЕНИЮ ВЫ ПРОИГРАЛИ, ВОЗМОЖНО ВАМ ПОВЕЗЁТ В СЛЕДУЮЩИЙ РАЗ!";
-                return false;
+            case 23 -> {
+                gameRes = "ВЫ ПРОИГРАЛИ!\nСыграем еще разок?";
+                gameOngoing = false; // игра окончена
+                return;
             }
         }
-
         // продолжаем игру
-        return true;
+        gameOngoing = true;
     }
-
-    //  МЕТОДЫ - ОБРАБОТЧИКИ
-
 
     // Метод обработки результата хода игры возврат числа (продолжаем игру 24, победила программа 23, победил игрок 22, ничья 21)
     public int checkResult() {
         //Проверка всех линий по горизонтале по вертикале и по двум диагоналям
-        //если все три ячейки вдоль линии заполнены 1 или 6 кто то выйграл (1-ИГРОК, 6-ПРОГРАММА)
         if ((cellDigital[7] + cellDigital[8] + cellDigital[9]) == 3
                 || (cellDigital[4] + cellDigital[5] + cellDigital[6]) == 3
                 || (cellDigital[1] + cellDigital[2] + cellDigital[3]) == 3
@@ -312,9 +320,9 @@ public class CrossZero {
 
     // Метод обработчик пустой клетки, ищет пустую клетку (цифра 0) в sellDigital, куда программа сделает свой ход
     public static int emptyCageMove(int[] sellDigital) {
-        for (int varible = 1; varible < 10; varible++) {
-            if (sellDigital[varible] == 0) {
-                return varible;
+        for (int i = 1; i < 10; i++) {
+            if (sellDigital[i] == 0) {
+                return i;
             }
         }
         return 100;//метод не отработал
