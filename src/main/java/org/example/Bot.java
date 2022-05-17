@@ -1,10 +1,13 @@
 package org.example;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -22,12 +25,12 @@ public class Bot extends TelegramLongPollingBot {
     private String BOT_TOKEN = null;
     private String BOT_NAME = null;
     private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-    Storage storage;
-    CrossZero cz;
+    private boolean gameOngoing = false;
+    private Storage storage;
+    private CrossZero cz;
 
     Bot() throws URISyntaxException {
         storage = new Storage();
-
         readFile();
         initKeyboard();
     }
@@ -41,6 +44,7 @@ public class Bot extends TelegramLongPollingBot {
             throw new IllegalArgumentException("file not found!");
         } else {
             file = new File(resource.toURI());
+            //System.out.println(resource.toURI());
         }
 
         try {
@@ -92,90 +96,95 @@ public class Bot extends TelegramLongPollingBot {
 
     public String parseMessage(String textMsg) {
         String response = "";
-        boolean gameOngoing = true;
 
-        //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
         switch (textMsg) {
             case "/start" -> response = "Приветствую, бот знает много цитат. Жми /get, чтобы получить случайную из них";
             case "/get", "Просвяти" -> response = storage.getRandQuote();
             case "Новая игра" -> {
                 cz = new CrossZero();
+                gameOngoing = true;
                 response = "Начнем игру! И та-а-ак... Крестики-Нолики!!!\n\n" + cz.drawingOutput()
-                         + "\nВаш ход - первый! Левое поле - игровое, а на правом поле вы можете видеть соответствие цифр клетке, сделайте свой ход...";
+                        + "\nВаш ход - первый! Левое поле - игровое, а на правом поле вы можете видеть соответствие цифр клетке, сделайте свой ход...";
             }
-            case "1" -> {
-                gameOngoing = cz.gameOngoing(1);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+        }
+
+        //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
+        if (gameOngoing) {
+            switch (textMsg) {
+                case "1" -> {
+                    gameOngoing = cz.gameOngoing(1);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "2" -> {
-                gameOngoing = cz.gameOngoing(2);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "2" -> {
+                    gameOngoing = cz.gameOngoing(2);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "3" -> {
-                gameOngoing = cz.gameOngoing(3);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "3" -> {
+                    gameOngoing = cz.gameOngoing(3);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "4" -> {
-                gameOngoing = cz.gameOngoing(4);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "4" -> {
+                    gameOngoing = cz.gameOngoing(4);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "5" -> {
-                gameOngoing = cz.gameOngoing(5);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "5" -> {
+                    gameOngoing = cz.gameOngoing(5);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "6" -> {
-                gameOngoing = cz.gameOngoing(6);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "6" -> {
+                    gameOngoing = cz.gameOngoing(6);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "7" -> {
-                gameOngoing = cz.gameOngoing(7);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "7" -> {
+                    gameOngoing = cz.gameOngoing(7);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "8" -> {
-                gameOngoing = cz.gameOngoing(8);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "8" -> {
+                    gameOngoing = cz.gameOngoing(8);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
-            }
-            case "9" -> {
-                gameOngoing = cz.gameOngoing(9);
-                if (gameOngoing) {
-                    response = cz.drawingOutput() + "\nВаш ход...";
-                } else {
-                    response = cz.drawingOutput();
+                case "9" -> {
+                    gameOngoing = cz.gameOngoing(9);
+                    if (gameOngoing) {
+                        response = cz.drawingOutput() + "\nВаш ход...";
+                    } else {
+                        response = cz.drawingOutput();
+                    }
                 }
+                default -> response = "Сообщение не распознано";
             }
-            default -> response = "Сообщение не распознано";
         }
 
         return response;
@@ -194,21 +203,23 @@ public class Bot extends TelegramLongPollingBot {
         KeyboardRow keyboardRow3 = new KeyboardRow();
         KeyboardRow keyboardRow4 = new KeyboardRow();
         keyboardRows.add(keyboardRow1);
-        keyboardRows.add(keyboardRow2);
-        keyboardRows.add(keyboardRow3);
-        keyboardRows.add(keyboardRow4);
         //Добавляем кнопки
         keyboardRow1.add(new KeyboardButton("Просвяти"));
         keyboardRow1.add(new KeyboardButton("Новая игра"));
-        keyboardRow4.add(new KeyboardButton("1"));
-        keyboardRow4.add(new KeyboardButton("2"));
-        keyboardRow4.add(new KeyboardButton("3"));
-        keyboardRow3.add(new KeyboardButton("4"));
-        keyboardRow3.add(new KeyboardButton("5"));
-        keyboardRow3.add(new KeyboardButton("6"));
-        keyboardRow2.add(new KeyboardButton("7"));
-        keyboardRow2.add(new KeyboardButton("8"));
-        keyboardRow2.add(new KeyboardButton("9"));
+        if (gameOngoing) {
+            keyboardRows.add(keyboardRow2);
+            keyboardRows.add(keyboardRow3);
+            keyboardRows.add(keyboardRow4);
+            keyboardRow4.add(new KeyboardButton("1"));
+            keyboardRow4.add(new KeyboardButton("2"));
+            keyboardRow4.add(new KeyboardButton("3"));
+            keyboardRow3.add(new KeyboardButton("4"));
+            keyboardRow3.add(new KeyboardButton("5"));
+            keyboardRow3.add(new KeyboardButton("6"));
+            keyboardRow2.add(new KeyboardButton("7"));
+            keyboardRow2.add(new KeyboardButton("8"));
+            keyboardRow2.add(new KeyboardButton("9"));
+        }
         //добавляем лист кнопок в главный объект
         replyKeyboardMarkup.setKeyboard(keyboardRows);
     }

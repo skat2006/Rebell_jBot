@@ -62,21 +62,21 @@ public class CrossZero {
 
         // ПРОВЕРЯЕМ РЕЗУЛЬТАТ ИГРЫ (НИЧЬЯ 21,победил ИГРОК 22,победила ПРОГРАММА 23, ИГРА ДАЛЬШЕ 24)
         switch (checkResult()) {
-            case 21 -> {
+            case 21: {
                 gameRes = "НИКТО НЕ ПОБЕДИЛ - У НАС НИЧЬЯ !";
-                return false;
+                return false; // игра окончена
             }
-            case 22 -> {
+            case 22: {
                 gameRes = "ПОЗДРАВЛЯЮ ВАС ВЫ ПОБЕДИТЕЛЬ !!!";
                 return false;
             }
-            case 23 -> {
+            case 23: {
                 gameRes = "К СОЖАЛЕНИЮ ВЫ ПРОИГРАЛИ, ВОЗМОЖНО ВАМ ПОВЕЗЁТ В СЛЕДУЮЩИЙ РАЗ!";
                 return false;
             }
         }
 
-        //ИГРА ОКОНЧЕНА
+        // продолжаем игру
         return true;
     }
 
