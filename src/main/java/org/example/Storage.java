@@ -12,9 +12,6 @@ public class Storage {
     Storage()
     {
         quoteList = new ArrayList<>();
-        quoteList.add("Начинать всегда стоит с того, что сеет сомнения. \n\nБорис Стругацкий.");
-        quoteList.add("80% успеха - это появиться в нужном месте в нужное время.\n\nВуди Аллен");
-        quoteList.add("Мы должны признать очевидное: понимают лишь те,кто хочет понять.\n\nБернар Вербер");
 
         parser("https://citatnica.ru/citaty/mudrye-tsitaty-velikih-lyudej");
     }
@@ -29,7 +26,7 @@ public class Storage {
 
     void parser(String strURL)
     {
-        String classNmae = "su-note-inner su-u-clearfix su-u-trim";
+        String className = "su-note-inner su-u-clearfix su-u-trim";
         Document doc = null;
         try {
             //Получаем документ нужной нам страницы
@@ -39,7 +36,7 @@ public class Storage {
         }
 
         //Получаем группу объектов, обращаясь методом из Jsoup к определенному блоку
-        Elements elQuote = doc.getElementsByClass(classNmae);
+        Elements elQuote = doc.getElementsByClass(className);
 
         //Достаем текст из каждого объекта поочереди и добавляем в наше хранилище
         elQuote.forEach(el -> {
