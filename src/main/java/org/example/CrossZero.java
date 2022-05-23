@@ -6,6 +6,7 @@ public class CrossZero {
     private int[] cellDigital;
     private String gameRes;
     private boolean gameOngoing;
+    private String userID = "none";
 
     CrossZero() {
         cell = new String[]{"0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
@@ -18,10 +19,17 @@ public class CrossZero {
     }
 
     public boolean isGameOngoing() {
-        return gameOngoing;
+        return this.gameOngoing;
     }
 
-    // Метод обработчик вывода на консоль, ячеек со строкового массива cell
+    public String getUserID() {
+        return this.userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
     public String drawingOutput() {
         for (int i = 1; i < 10; i++) {
             if (cellDigital[i] == 1) {

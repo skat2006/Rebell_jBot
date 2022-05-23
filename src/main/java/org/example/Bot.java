@@ -9,35 +9,26 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 
 public class Bot extends TelegramLongPollingBot {
-    private String BOT_TOKEN = null;
-    private String BOT_NAME = "Rebell_jBot";
+
+    private final String BOT_TOKEN;
+    private final String BOT_NAME;
     private final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-    private final Storage storage;
+    private final Storage storage = new Storage();
     private CrossZero cz;
 
+    private long msgUserID;
+    private String msgUserFirstName;
+
     Bot() throws InterruptedException {
-        BOT_TOKEN = getToken();
-        storage = new Storage();
+        GetProperties properties = new GetProperties();
+        BOT_TOKEN = properties.getToken();
+        BOT_NAME = properties.getName();
         cz = new CrossZero();
         cz.setGameOngoing(false);
-    }
-
-
-    public String getToken() {
-        Properties prop = new Properties();
-        try {
-            //load a properties file from class path, inside static method
-            prop.load(Bot.class.getClassLoader().getResourceAsStream("config.properties"));
-            return prop.getProperty("token");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 
     @Override
@@ -52,35 +43,48 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        SendMessage outMess = null;
+        SendMessage outMess;
 
         try {
             if (update.hasMessage() && update.getMessage().hasText()) {
                 Message inMess = update.getMessage(); //Извлекаем из объекта сообщение пользователя
                 String chatId = inMess.getChatId().toString(); //Достаем из inMess id чата пользователя
+
+                msgUserID = inMess.getFrom().getId();
+                msgUserFirstName = inMess.getFrom().getFirstName();
+
                 String response = parseMessage(inMess.getText()); //Получаем текст сообщения пользователя, отправляем в написанный нами обработчик
                 outMess = new SendMessage(); //Создаем объект класса SendMessage - наш будущий ответ пользователю
 
-                //Добавляем в наше сообщение id чата а также наш ответ
+                //Добавляем в наше сообщение id чата и наш ответ
                 outMess.setChatId(chatId);
                 outMess.setText(response);
                 outMess.setReplyMarkup(replyKeyboardMarkup);
 
                 //Отправка в чат
                 execute(outMess);
-
             }
-        } catch (TelegramApiException e) {
+        } catch (TelegramApiException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public String parseMessage(String textMsg) {
+    public String parseMessage(String textMsg) throws SQLException {
         String response = null;
+        cz.setUserID(msgUserFirstName);
 
         //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
         if (cz.isGameOngoing()) {
             switch (textMsg) {
+                case "Стоп игра" -> {
+                    cz.setGameOngoing(false);
+                    System.out.println(cz.getUserID());
+                    JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                    jdbSpostgreSQL.insertUserRecord(msgUserID, msgUserFirstName);
+                    //jdbSpostgreSQL.getUserByPerson(cz.getUserID());
+                    //jdbSpostgreSQL.getAllUsers();
+                    jdbSpostgreSQL.getUserByID(msgUserID);
+                }
                 case "1" -> cz.gameOngoing(1);
                 case "2" -> cz.gameOngoing(2);
                 case "3" -> cz.gameOngoing(3);
@@ -92,16 +96,19 @@ public class Bot extends TelegramLongPollingBot {
                 case "9" -> cz.gameOngoing(9);
                 default -> response = "Сообщение не распознано";
             }
-
             if (response == null) response = cz.drawingOutput();
         }
 
         switch (textMsg) {
-            case "/start" -> response = "Приветствую, бот знает много цитат. Жми /get, чтобы получить случайную из них";
+            case "/start" -> response = "Приветствую " + cz.getUserID() + ", бот умеет играть в Крестики-Нолики и знает много цитат!\nЖми /get или пользуйся клавиатурой внизу, чтобы получить случайную цитату или начать игру.";
             case "/get", "Просвяти" -> response = storage.getRandQuote();
             case "/game", "Новая игра" -> {
                 cz = new CrossZero();
                 cz.setGameOngoing(true);
+                cz.setUserID(msgUserFirstName);
+                System.out.println(cz.getUserID());
+                //JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                //jdbSpostgreSQL.insertUserRecord(cz.getUserID());
                 response = "Начнем игру! И та-а-ак... Крестики-Нолики!!!\n\n" + cz.drawingOutput()
                         + "\nВаш ход - первый! Левое поле - игровое, а на правом поле вы можете видеть соответствие цифр клетке, сделайте свой ход...";
             }
@@ -126,6 +133,9 @@ public class Bot extends TelegramLongPollingBot {
         keyboardRows.add(keyboardRow1);
         //Добавляем кнопки
         keyboardRow1.add(new KeyboardButton("Новая игра"));
+        if (cz.isGameOngoing()) {
+            keyboardRow1.add(new KeyboardButton("Стоп игра"));
+        }
         keyboardRow1.add(new KeyboardButton("Просвяти"));
         if (cz.isGameOngoing()) {
             keyboardRows.add(keyboardRow2);
