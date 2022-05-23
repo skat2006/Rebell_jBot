@@ -6,7 +6,17 @@ public class CrossZero {
     private int[] cellDigital;
     private String gameRes;
     private boolean gameOngoing;
-    private String userID = "none";
+    private long userID = -1;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    private String userName = null;
 
     CrossZero() {
         cell = new String[]{"0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
@@ -22,11 +32,11 @@ public class CrossZero {
         return this.gameOngoing;
     }
 
-    public String getUserID() {
+    public long getUserID() {
         return this.userID;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(long userID) {
         this.userID = userID;
     }
 
@@ -84,16 +94,28 @@ public class CrossZero {
             case 21 -> {
                 gameRes = "А вот и НИЧЬЯ! :)";
                 gameOngoing = false; // игра окончена
+                if (userID != -1) {
+                    JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                    jdbSpostgreSQL.insertUserRecord(userID, userName);
+                }
                 return;
             }
             case 22 -> {
                 gameRes = "ВЫ ПОБЕДИТЕЛЬ !!!\nПриклоняюсь перед Вашим мастерством!";
                 gameOngoing = false; // игра окончена
+                if (userID != -1) {
+                    JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                    jdbSpostgreSQL.increaseScoreByID(userID, userName);
+                }
                 return;
             }
             case 23 -> {
                 gameRes = "ВЫ ПРОИГРАЛИ!\nСыграем еще разок?";
                 gameOngoing = false; // игра окончена
+                if (userID != -1) {
+                    JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                    jdbSpostgreSQL.insertUserRecord(userID, userName);
+                }
                 return;
             }
         }

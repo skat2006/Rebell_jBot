@@ -71,19 +71,16 @@ public class Bot extends TelegramLongPollingBot {
 
     public String parseMessage(String textMsg) throws SQLException {
         String response = null;
-        cz.setUserID(msgUserFirstName);
+        cz.setUserID(msgUserID);
+        cz.setUserName(msgUserFirstName);
 
         //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
         if (cz.isGameOngoing()) {
             switch (textMsg) {
                 case "Стоп игра" -> {
                     cz.setGameOngoing(false);
-                    System.out.println(cz.getUserID());
                     JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
                     jdbSpostgreSQL.insertUserRecord(msgUserID, msgUserFirstName);
-                    //jdbSpostgreSQL.getUserByPerson(cz.getUserID());
-                    //jdbSpostgreSQL.getAllUsers();
-                    jdbSpostgreSQL.getUserByID(msgUserID);
                 }
                 case "1" -> cz.gameOngoing(1);
                 case "2" -> cz.gameOngoing(2);
@@ -105,10 +102,8 @@ public class Bot extends TelegramLongPollingBot {
             case "/game", "Новая игра" -> {
                 cz = new CrossZero();
                 cz.setGameOngoing(true);
-                cz.setUserID(msgUserFirstName);
-                System.out.println(cz.getUserID());
-                //JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
-                //jdbSpostgreSQL.insertUserRecord(cz.getUserID());
+                cz.setUserID(msgUserID);
+                cz.setUserName(msgUserFirstName);
                 response = "Начнем игру! И та-а-ак... Крестики-Нолики!!!\n\n" + cz.drawingOutput()
                         + "\nВаш ход - первый! Левое поле - игровое, а на правом поле вы можете видеть соответствие цифр клетке, сделайте свой ход...";
             }

@@ -7,46 +7,22 @@ public class JDBSpostgreSQL {
     GetProperties properties = new GetProperties();
 
     public Connection connectDB() {
-
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println("PostgreSQL JDBC Driver is not found. Include it in your library path ");
-            e.printStackTrace();
-            return null;
-        }
-
         Connection connection;
         try {
-            connection = DriverManager
-                    .getConnection(properties.getDB(), properties.getUser(), properties.getPass());
+            connection = DriverManager.getConnection(properties.getDB(), properties.getUser(), properties.getPass());
         } catch (SQLException e) {
-            System.out.println("Connection Failed");
+            System.out.println("DB connection Failed");
             e.printStackTrace();
             return null;
         }
         return connection;
     }
 
-    private static final String createTableSQL = "CREATE TABLE users " +
-            "(ID INT PRIMARY KEY ," +
-            " PERSON VARCHAR(50), " +
-            " SCORE NUMERIC)";
-
-    public void createTable() throws SQLException {
-
-        try (Statement statement = connectDB().createStatement();) {
-            statement.execute(createTableSQL);
-        } catch (SQLException e) {
-            printSQLException(e);
-        }
-    }
-
     private static final String INSERT_USERS_SQL = "INSERT INTO users" +
             "  (id, person, score) VALUES " +
             " (?, ?, ?);";
 
-    public void insertUserRecord(long userID, String userName) throws SQLException {
+    public void insertUserRecord(long userID, String userName) {
         if (!getUserByID(userID)) {
             try (PreparedStatement preparedStatement = connectDB().prepareStatement(INSERT_USERS_SQL)) {
                 preparedStatement.setInt(1, (int) userID);
@@ -60,11 +36,58 @@ public class JDBSpostgreSQL {
         // Step 4: try-with-resource statement will auto close the connection.
     }
 
-    private static final String QUERY = "select id, person, score from Users where id =?";
-    private static final String SELECT_ALL_QUERY = "select * from users";
+    public void insertUserRecord(long userID, String userName, int score) {
+        if (!getUserByID(userID)) {
+            try (PreparedStatement preparedStatement = connectDB().prepareStatement(INSERT_USERS_SQL)) {
+                preparedStatement.setInt(1, (int) userID);
+                preparedStatement.setString(2, userName);
+                preparedStatement.setInt(3, score);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                printSQLException(e);
+            }
+        }
+        // Step 4: try-with-resource statement will auto close the connection.
+    }
+
+    private static final String SET_SCORE_SQL = "UPDATE users " +
+            "SET score =? " +
+            "WHERE id =?;";
+
+    public void increaseScoreByID(long userID, String userName) {
+        if (getUserByID(userID)) {
+            try (PreparedStatement preparedStatement = connectDB().prepareStatement(SET_SCORE_SQL)) {
+                preparedStatement.setInt(1, getScoreByID(userID) + 1);
+                preparedStatement.setInt(2, (int) userID);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                printSQLException(e);
+            }
+        } else {
+            insertUserRecord(userID, userName, 1);
+        }
+    }
+
+    private static final String QUERY_SCORE = "select score from Users where id =?";
+
+    public int getScoreByID(long userID) {
+        try (PreparedStatement preparedStatement = connectDB().prepareStatement(QUERY_SCORE)) {
+            preparedStatement.setInt(1, (int) userID);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                return rs.getInt("score");
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return -1;
+    }
+
+    private static final String QUERY_USER = "select id, person, score from Users where id =?";
 
     public boolean getUserByID(long userID) {
-        try (PreparedStatement preparedStatement = connectDB().prepareStatement(QUERY);) {
+        try (PreparedStatement preparedStatement = connectDB().prepareStatement(QUERY_USER)) {
             preparedStatement.setInt(1, (int) userID);
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -81,12 +104,11 @@ public class JDBSpostgreSQL {
         return false;
     }
 
-    public void getAllUsers() {
-        // using try-with-resources to avoid closing resources (boiler plate
-        // code)
+    private static final String SELECT_ALL_QUERY = "select * from users";
 
+    public void getAllUsers() {
         // Step 1: Establishing a Connection
-        try (PreparedStatement preparedStatement = connectDB().prepareStatement(SELECT_ALL_QUERY);) {
+        try (PreparedStatement preparedStatement = connectDB().prepareStatement(SELECT_ALL_QUERY)) {
             ResultSet rs = preparedStatement.executeQuery();
 
             // Step 4: Process the ResultSet object.

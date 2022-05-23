@@ -9,7 +9,7 @@ public class GetProperties {
 
     GetProperties() {
         try {
-            prop.load(Bot.class.getClassLoader().getResourceAsStream("config.properties"));
+            prop.load(GetProperties.class.getClassLoader().getResourceAsStream("config.properties"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
