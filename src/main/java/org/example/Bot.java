@@ -21,6 +21,7 @@ public class Bot extends TelegramLongPollingBot {
     private CrossZero cz;
 
     private long msgUserID;
+    private long msgUserChatID;
     private String msgUserFirstName;
 
     Bot() throws InterruptedException {
@@ -51,6 +52,7 @@ public class Bot extends TelegramLongPollingBot {
                 String chatId = inMess.getChatId().toString(); //Достаем из inMess id чата пользователя
 
                 msgUserID = inMess.getFrom().getId();
+                msgUserChatID = inMess.getChatId();
                 msgUserFirstName = inMess.getFrom().getFirstName();
 
                 String response = parseMessage(inMess.getText()); //Получаем текст сообщения пользователя, отправляем в написанный нами обработчик
@@ -73,6 +75,7 @@ public class Bot extends TelegramLongPollingBot {
         String response = null;
 
         cz.setUserID(msgUserID);
+        cz.setUserChatId(msgUserChatID);
         cz.setUserName(msgUserFirstName);
 
         //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
@@ -81,7 +84,7 @@ public class Bot extends TelegramLongPollingBot {
                 case "Стоп игра" -> {
                     cz.setGameOngoing(false);
                     JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
-                    jdbSpostgreSQL.insertUserRecord(msgUserID, msgUserFirstName);
+                    jdbSpostgreSQL.insertUserRecord(msgUserID, msgUserFirstName, msgUserChatID);
                 }
                 case "1" -> cz.gameOngoing(1);
                 case "2" -> cz.gameOngoing(2);

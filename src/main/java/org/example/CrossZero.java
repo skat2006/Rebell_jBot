@@ -8,6 +8,8 @@ public class CrossZero {
     private boolean gameOngoing;
     private long userID = -1;
 
+    private long userChatId = -1;
+
     public String getUserName() {
         return userName;
     }
@@ -38,6 +40,14 @@ public class CrossZero {
 
     public void setUserID(long userID) {
         this.userID = userID;
+    }
+
+    public long getUserChatId() {
+        return userChatId;
+    }
+
+    public void setUserChatId(long userChatId) {
+        this.userChatId = userChatId;
     }
 
     public String drawingOutput() {
@@ -96,7 +106,7 @@ public class CrossZero {
                 gameOngoing = false; // игра окончена
                 if (userID != -1) {
                     JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
-                    jdbSpostgreSQL.insertUserRecord(userID, userName);
+                    jdbSpostgreSQL.insertUserRecord(userID, userName, userChatId);
                 }
                 return;
             }
@@ -114,7 +124,7 @@ public class CrossZero {
                 gameOngoing = false; // игра окончена
                 if (userID != -1) {
                     JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
-                    jdbSpostgreSQL.insertUserRecord(userID, userName);
+                    jdbSpostgreSQL.insertUserRecord(userID, userName, userChatId);
                 }
                 return;
             }
