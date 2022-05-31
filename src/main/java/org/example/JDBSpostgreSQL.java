@@ -19,15 +19,16 @@ public class JDBSpostgreSQL {
     }
 
     private static final String INSERT_USERS_SQL = "INSERT INTO users" +
-            "  (id, person, score) VALUES " +
-            " (?, ?, ?);";
+            "  (id, person, score, chat_id) VALUES " +
+            " (?, ?, ?, ?);";
 
-    public void insertUserRecord(long userID, String userName) {
+    public void insertUserRecord(long userID, String userName, long chatID) {
         if (!getUserByID(userID)) {
             try (PreparedStatement preparedStatement = connectDB().prepareStatement(INSERT_USERS_SQL)) {
                 preparedStatement.setInt(1, (int) userID);
                 preparedStatement.setString(2, userName);
                 preparedStatement.setInt(3, 0);
+                preparedStatement.setInt(4,(int) chatID);
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 printSQLException(e);
@@ -35,12 +36,13 @@ public class JDBSpostgreSQL {
         }
     }
 
-    public void insertUserRecord(long userID, String userName, int score) {
+    public void insertUserRecord(long userID, String userName, int score, long chatID) {
         if (!getUserByID(userID)) {
             try (PreparedStatement preparedStatement = connectDB().prepareStatement(INSERT_USERS_SQL)) {
                 preparedStatement.setInt(1, (int) userID);
                 preparedStatement.setString(2, userName);
                 preparedStatement.setInt(3, score);
+                preparedStatement.setInt(4,(int) chatID);
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 printSQLException(e);
@@ -82,7 +84,7 @@ public class JDBSpostgreSQL {
         return -1;
     }
 
-    private static final String QUERY_USER = "select id, person, score from Users where id =?";
+    private static final String QUERY_USER = "select id, person, score, chat_id from Users where id =?";
 
     public boolean getUserByID(long userID) {
         try (PreparedStatement preparedStatement = connectDB().prepareStatement(QUERY_USER)) {
@@ -90,10 +92,7 @@ public class JDBSpostgreSQL {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String person = rs.getString("person");
-                int score = rs.getInt("score");
-                System.out.println(id + "," + person + "," + score);
+                getAllColumns(rs);
                 return true;
             }
         } catch (SQLException e) {
@@ -109,14 +108,19 @@ public class JDBSpostgreSQL {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String person = rs.getString("person");
-                int score = rs.getInt("score");
-                System.out.println(id + "," + person + "," + score);
+                getAllColumns(rs);
             }
         } catch (SQLException e) {
             printSQLException(e);
         }
+    }
+
+    private void getAllColumns(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt("id");
+        String person = resultSet.getString("person");
+        int score = resultSet.getInt("score");
+        int chatID = resultSet.getInt("chat_id");
+        System.out.println(id + "," + person + "," + score + "," + chatID);
     }
 
     public static void printSQLException(SQLException ex) {
