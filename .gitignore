@@ -6,3 +6,4 @@
 /target/
 /target/classes/
 /target/classes/org/example/
+/src/main/resources/postgresql-42.3.5.jar

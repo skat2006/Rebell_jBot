@@ -9,23 +9,20 @@ import java.util.ArrayList;
 
 public class Storage {
     private final ArrayList<String> quoteList;
-    Storage() throws InterruptedException {
+    Storage() {
         quoteList = new ArrayList<>();
         quoteList.add("Тише будешь - дальше едешь!");
-        //wait(5000);
-        parser("https://citatnica.ru/citaty/mudrye-tsitaty-velikih-lyudej");
+        parser("https://citatnica.ru/citaty/mudrye-tsitaty-velikih-lyudej", "su-note-inner su-u-clearfix su-u-trim");
     }
 
     String getRandQuote()
     {
-        //получаем случайное значение в интервале от 0 до самого большого индекса
-        int randValue = (int)(Math.random() * quoteList.size());
         //Из коллекции получаем цитату со случайным индексом и возвращаем ее
+        int randValue = (int)(Math.random() * quoteList.size());
         return quoteList.get(randValue);
     }
 
-    void parser(String strURL) {
-        String className = "su-note-inner su-u-clearfix su-u-trim";
+    void parser(String strURL, String className) {
         Document doc = null;
         try {
             //Получаем документ нужной нам страницы

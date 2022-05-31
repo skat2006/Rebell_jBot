@@ -6,6 +6,17 @@ public class CrossZero {
     private int[] cellDigital;
     private String gameRes;
     private boolean gameOngoing;
+    private long userID = -1;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    private String userName = null;
 
     CrossZero() {
         cell = new String[]{"0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
@@ -18,10 +29,17 @@ public class CrossZero {
     }
 
     public boolean isGameOngoing() {
-        return gameOngoing;
+        return this.gameOngoing;
     }
 
-    // Метод обработчик вывода на консоль, ячеек со строкового массива cell
+    public long getUserID() {
+        return this.userID;
+    }
+
+    public void setUserID(long userID) {
+        this.userID = userID;
+    }
+
     public String drawingOutput() {
         for (int i = 1; i < 10; i++) {
             if (cellDigital[i] == 1) {
@@ -76,16 +94,28 @@ public class CrossZero {
             case 21 -> {
                 gameRes = "А вот и НИЧЬЯ! :)";
                 gameOngoing = false; // игра окончена
+                if (userID != -1) {
+                    JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                    jdbSpostgreSQL.insertUserRecord(userID, userName);
+                }
                 return;
             }
             case 22 -> {
                 gameRes = "ВЫ ПОБЕДИТЕЛЬ !!!\nПриклоняюсь перед Вашим мастерством!";
                 gameOngoing = false; // игра окончена
+                if (userID != -1) {
+                    JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                    jdbSpostgreSQL.increaseScoreByID(userID, userName);
+                }
                 return;
             }
             case 23 -> {
                 gameRes = "ВЫ ПРОИГРАЛИ!\nСыграем еще разок?";
                 gameOngoing = false; // игра окончена
+                if (userID != -1) {
+                    JDBSpostgreSQL jdbSpostgreSQL = new JDBSpostgreSQL();
+                    jdbSpostgreSQL.insertUserRecord(userID, userName);
+                }
                 return;
             }
         }
