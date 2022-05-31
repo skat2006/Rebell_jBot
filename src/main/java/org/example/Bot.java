@@ -71,6 +71,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public String parseMessage(String textMsg) throws SQLException {
         String response = null;
+
         cz.setUserID(msgUserID);
         cz.setUserName(msgUserFirstName);
 

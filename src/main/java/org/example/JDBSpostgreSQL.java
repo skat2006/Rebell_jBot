@@ -33,7 +33,6 @@ public class JDBSpostgreSQL {
                 printSQLException(e);
             }
         }
-        // Step 4: try-with-resource statement will auto close the connection.
     }
 
     public void insertUserRecord(long userID, String userName, int score) {
@@ -47,7 +46,6 @@ public class JDBSpostgreSQL {
                 printSQLException(e);
             }
         }
-        // Step 4: try-with-resource statement will auto close the connection.
     }
 
     private static final String SET_SCORE_SQL = "UPDATE users " +
@@ -107,11 +105,9 @@ public class JDBSpostgreSQL {
     private static final String SELECT_ALL_QUERY = "select * from users";
 
     public void getAllUsers() {
-        // Step 1: Establishing a Connection
         try (PreparedStatement preparedStatement = connectDB().prepareStatement(SELECT_ALL_QUERY)) {
             ResultSet rs = preparedStatement.executeQuery();
 
-            // Step 4: Process the ResultSet object.
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String person = rs.getString("person");
